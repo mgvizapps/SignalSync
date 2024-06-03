@@ -1,0 +1,15 @@
+{
+    "hsapiens_grch37": {
+        "id": "hsapiens",
+        "assembly": "grch37",
+        "name": "Homo sapiens GRCh37",
+        "biomartHost": "http://grch37.ensembl.org/biomart"
+    },
+    "hsapiens_grch38": {
+        "id": "hsapiens",
+        "assembly": "grch38",
+        "name": "Homo sapiens GRCh38",
+        "biomartHost": "http://asia.ensembl.org/biomart"
+    }
+}
+

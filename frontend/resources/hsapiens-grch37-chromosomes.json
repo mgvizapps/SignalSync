@@ -1,0 +1,170 @@
+[
+    {
+        "name": "1",
+        "label": "chr1",
+        "length": 249250621,
+        "start": 1,
+        "end": 249250621
+    },
+    {
+        "name": "2",
+        "label": "chr2",
+        "length": 243199373,
+        "start": 1,
+        "end": 243199373
+    },
+    {
+        "name": "3",
+        "label": "chr3",
+        "length": 198022430,
+        "start": 1,
+        "end": 198022430
+    },
+    {
+        "name": "4",
+        "label": "chr4",
+        "length": 191154276,
+        "start": 1,
+        "end": 191154276
+    },
+    {
+        "name": "5",
+        "label": "chr5",
+        "length": 180915260,
+        "start": 1,
+        "end": 180915260
+    },
+    {
+        "name": "6",
+        "label": "chr6",
+        "length": 171115067,
+        "start": 1,
+        "end": 171115067
+    },
+    {
+        "name": "7",
+        "label": "chr7",
+        "length": 159138663,
+        "start": 1,
+        "end": 159138663
+    },
+    {
+        "name": "8",
+        "label": "chr8",
+        "length": 146364022,
+        "start": 1,
+        "end": 146364022
+    },
+    {
+        "name": "9",
+        "label": "chr9",
+        "length": 141213431,
+        "start": 1,
+        "end": 141213431
+    },
+    {
+        "name": "10",
+        "label": "chr10",
+        "length": 135534747,
+        "start": 1,
+        "end": 135534747
+    },
+    {
+        "name": "11",
+        "label": "chr11",
+        "length": 135006516,
+        "start": 1,
+        "end": 135006516
+    },
+    {
+        "name": "12",
+        "label": "chr12",
+        "length": 133851895,
+        "start": 1,
+        "end": 133851895
+    },
+    {
+        "name": "13",
+        "label": "chr13",
+        "length": 115169878,
+        "start": 1,
+        "end": 115169878
+    },
+    {
+        "name": "14",
+        "label": "chr14",
+        "length": 107349540,
+        "start": 1,
+        "end": 107349540
+    },
+    {
+        "name": "15",
+        "label": "chr15",
+        "length": 102531392,
+        "start": 1,
+        "end": 102531392
+    },
+    {
+        "name": "16",
+        "label": "chr16",
+        "length": 90354753,
+        "start": 1,
+        "end": 90354753
+    },
+    {
+        "name": "17",
+        "label": "chr17",
+        "length": 81195210,
+        "start": 1,
+        "end": 81195210
+    },
+    {
+        "name": "18",
+        "label": "chr18",
+        "length": 78077248,
+        "start": 1,
+        "end": 78077248
+    },
+    {
+        "name": "19",
+        "label": "chr19",
+        "length": 59128983,
+        "start": 1,
+        "end": 59128983
+    },
+    {
+        "name": "20",
+        "label": "chr20",
+        "length": 63025520,
+        "start": 1,
+        "end": 63025520
+    },
+    {
+        "name": "21",
+        "label": "chr21",
+        "length": 48129895,
+        "start": 1,
+        "end": 48129895
+    },
+    {
+        "name": "22",
+        "label": "chr22",
+        "length": 51304566,
+        "start": 1,
+        "end": 51304566
+    },
+    {
+        "name": "X",
+        "label": "chrX",
+        "length": 155270560,
+        "start": 1,
+        "end": 155270560
+    },
+    {
+        "name": "Y",
+        "label": "chrY",
+        "length": 59373566,
+        "start": 1,
+        "end": 59373566
+    }
+]

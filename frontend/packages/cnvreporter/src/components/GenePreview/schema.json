@@ -1,0 +1,521 @@
+{
+    "width": 0,
+    "height": 0,
+    "margin": 20,
+    "theme": "light",
+    "state": [
+        {"name": "stats_min", "value": []},
+        {"name": "stats_max", "value": []},
+        {"name": "max_germline_tumor", "value": 0},
+        {"name": "max_diff", "value": 0},
+        {"name": "region_hover", "value": null},
+        {"name": "amplification", "value": 0.25},
+        {"name": "deletion", "value": -0.25}
+    ],
+    "data": [{
+        "name": "regions",
+        "value": [],
+        "transform": [{
+            "type": "summarize",
+            "groupby": null,
+            "fields": ["start", "end"],
+            "op": ["min", "max"],
+            "as": ["region_start", "region_end"],
+            "join": true
+        }, {
+            "type": "formula",
+            "expr": "(datum.start - datum.region_start) / (datum.region_end - datum.region_start)",
+            "as": "_start"
+        }, {
+            "type": "formula",
+            "expr": "(datum.end - datum.region_start) / (datum.region_end - datum.region_start)",
+            "as": "_end"
+        }]
+    }, {
+        "name": "stats",
+        "source": "regions",
+        "transform": [
+            {"type": "formula", "expr": "datum.stats.q75 - datum.stats.q25", "as": "iqr"},
+            {"type": "formula", "expr": "max(datum.stats.min, datum.stats.q25 - 1.5 * datum.iqr)", "as": "rangeStart"},
+            {"type": "formula", "expr": "min(datum.stats.max, datum.stats.q75 + 1.5 * datum.iqr)", "as": "rangeEnd"},
+            {"type": "range", "field": "stats.min", "state": "stats_min"},
+            {"type": "range", "field": "stats.max", "state": "stats_max"}
+        ]
+    }, {
+        "name": "coverages",
+        "value": [],
+        "transform": [
+            {"type": "identifier", "as": "position"}
+        ]
+    }, {
+        "name": "coverages_regions",
+        "source": "coverages",
+        "transform": [{
+            "type": "summarize",
+            "groupby": "region_id",
+            "fields": ["position", "position"],
+            "op": ["min", "max"],
+            "as": ["start", "end"]
+        }, {
+            "type": "formula",
+            "expr": "max(0, datum.start - 1)",
+            "as": "start"
+        }, {
+            "type": "rename", 
+            "fields": ["region_id"], 
+            "as": ["id"]
+        }, {
+            "type": "extend",
+            "from": "regions",
+            "key": "id",
+            "fields": ["_start", "_end"],
+            "as": ["_start", "_end"]
+        }]
+    }, {
+        "name": "background",
+        "value": [],
+        "transform": [
+            {"type": "identifier", "as": "position"}
+        ] 
+    }], 
+    "scales": [{
+        "name": "layout",
+        "type": "interval",
+        "range": [0, {"draw": "height"}],
+        "spacing": 0.2,
+        "domain": ["stats", "transcript", "germline_tumor", "diff"]
+    }, {
+        "name": "regions",
+        "type": "linear",
+        "range": {"draw": "width"},
+        "domain": [0, 1]
+    }, {
+        "name": "stats_x",
+        "type": "interval",
+        "domain": {"data": "regions", "field": "id"},
+        "range": {"draw": "width"},
+        "margin": 0
+    }, {
+        "name": "stats_y",
+        "type": "linear",
+        "domain": [
+            {"expr": "min(state.deletion, state.stats_min[0]) - 0.1"}, 
+            {"expr": "max(state.amplification, state.stats_max[1]) + 0.1"}
+        ],
+        "range": [
+            {"scale": "layout", "value": "stats", "interval": 1},
+            {"scale": "layout", "value": "stats", "interval": 0}
+        ]
+    }, {
+        "name": "germline_tumor_x",
+        "type": "linear",
+        "domain": {"data": "coverages", "field": "position"},
+        "range": {"draw": "width"}
+    }, {
+        "name": "germline_tumor_y",
+        "type": "linear",
+        "domain": [0, {"state": "max_germline_tumor"}],
+        "range": [
+            {"scale": "layout", "value": "germline_tumor", "interval": 1},
+            {"scale": "layout", "value": "germline_tumor", "interval": 0}
+        ]
+    }, {
+        "name": "diff_x",
+        "type": "linear",
+        "domain": {"data": "coverages", "field": "position"},
+        "range": {"draw": "width"}
+    }, {
+        "name": "diff_y",
+        "type": "linear",
+        "domain": [
+            {"expr": "min(-1, - state.max_diff)"},
+            {"expr": "max(1, state.max_diff)"}
+        ],
+        "range": [
+            {"scale": "layout", "value": "diff", "interval": 1},
+            {"scale": "layout", "value": "diff", "interval": 0}
+        ]
+    }],
+    "axes": [{
+        "position": "left",
+        "scale": "stats_y",
+        "values": 5,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "end"
+    }, {
+        "position": "left",
+        "scale": "germline_tumor_y",
+        "values": 4,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "end"
+    }, {
+        "position": "left",
+        "scale": "diff_y",
+        "values": 4,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "end"
+    }, {
+        "position": "right",
+        "scale": "stats_y",
+        "values": 5,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "start"
+    }, {
+        "position": "right",
+        "scale": "germline_tumor_y",
+        "values": 4,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "start"
+    }, {
+        "position": "right",
+        "scale": "diff_y",
+        "values": 4,
+        "label": true,
+        "labelSize": "8px",
+        "labelAnchor": "start"
+    }],
+    "geoms": [{
+        "name": "hoverBoxplots",
+        "type": "polyline",
+        "source": {"data": "regions"},
+        "render": {
+            "init": {
+                "points": [
+                    [{"field": "id", "scale": "stats_x", "interval": 0}, {"value": "stats", "scale": "layout", "interval": 0}],
+                    [{"field": "id", "scale": "stats_x", "interval": 1}, {"value": "stats", "scale": "layout", "interval": 0}],
+                    [{"field": "id", "scale": "stats_x", "interval": 1}, {"value": "stats", "scale": "layout", "interval": 1}],
+                    [{"field": "_end", "scale": "regions"}, {"value": "transcript", "scale": "layout", "interval": 0.4}],
+                    [{"field": "_start", "scale": "regions"}, {"value": "transcript", "scale": "layout", "interval": 0.4}],
+                    [{"field": "id", "scale": "stats_x", "interval": 0}, {"value": "stats", "scale": "layout", "interval": 1}]
+                ],
+                "closed": {"value": true},
+                "opacity": {"value": "0.2"}
+            },
+            "update": {
+               "fill": [
+                    {"test": "datum.id === state.region_hover", "color": "orange"},
+                    {"value": "transparent"}
+                ]
+            }
+        }
+    }, {
+        "name": "hoverCoverages",
+        "type": "polyline",
+        "source": {"data": "coverages_regions"},
+        "render": {
+            "init": {
+                "points": [
+                    [{"field": "_end", "scale": "regions"}, {"value": "transcript", "scale": "layout", "interval": 0.6}],
+                    [{"field": "end", "scale": "germline_tumor_x"}, {"value": "germline_tumor", "scale": "layout", "interval": 0}],
+                    [{"field": "end", "scale": "germline_tumor_x"}, {"value": "diff", "scale": "layout", "interval": 1}],
+                    [{"field": "start", "scale": "germline_tumor_x"}, {"value": "diff", "scale": "layout", "interval": 1}],
+                    [{"field": "start", "scale": "germline_tumor_x"}, {"value": "germline_tumor", "scale": "layout", "interval": 0}],
+                    [{"field": "_start", "scale": "regions"}, {"value": "transcript", "scale": "layout", "interval": 0.6}]
+                ],
+                "closed": {"value": true},
+                "opacity": {"value": "0.2"}
+            },
+            "update": {
+               "fill": [
+                    {"test": "datum.id === state.region_hover", "color": "orange"},
+                    {"value": "transparent"}
+                ]
+            }
+        }
+    }, {
+        "description": "exons line",
+        "type": "line",
+        "render": {
+            "init": {
+                "x1": {"value": 0, "scale": "regions"},
+                "x2": {"value": 1, "scale": "regions"},
+                "y": {"value": "transcript", "scale": "layout", "interval": 0.5},
+                "stroke": {"color": "blue"},
+                "strokeWidth": {"value": 2}
+            }
+        }
+    }, {
+        "description": "exons rectangles",
+        "name": "exons",
+        "type": "rectangle",
+        "source": {"data": "regions"},
+        "render": {
+            "init": {
+                "x1": {"field": "_start", "scale": "regions"},
+                "x2": {"field": "_end", "scale": "regions"},
+                "y1": {"value": "transcript", "scale": "layout", "interval": 0.4},
+                "y2": {"value": "transcript", "scale": "layout", "interval": 0.6}
+            },
+            "update": {
+                "fill": [
+                    {"test": "datum.id === state.region_hover", "color": "orange"},
+                    {"color": "blue"}
+                ]
+            }
+        }
+    }, {
+        "description": "Amplification threshold in boxplot",
+        "type": "line",
+        "render": {
+            "init": {
+                "x1": {"value": 0},
+                "x2": {"draw": "width"},
+                "fill": {"value": "none"},
+                "stroke": {"color": "green"},
+                "strokeWidth": {"value": "1px"},
+                "opacity": {"value": 0.5}
+            },
+            "update": {
+                "y": {"state": "amplification", "scale": "stats_y"}
+            }
+        }
+    }, {
+        "description": "Deletion threshold in boxplot",
+        "type": "line",
+        "render": {
+            "init": {
+                "x1": {"value": 0},
+                "x2": {"draw": "width"},
+                "fill": {"value": "none"},
+                "stroke": {"color": "red"},
+                "strokeWidth": {"value": "1px"},
+                "opacity": {"value": 0.5}
+            },
+            "update": {
+                "y": {"state": "deletion", "scale": "stats_y"}
+            }
+        }
+    }, {
+        "description": "Boxplot line",
+        "type": "line",
+        "source": {"data": "stats"},
+        "render": {
+            "init": {
+                "x1": {"field": "id", "scale": "stats_x", "interval": 0.5},
+                "x2": {"field": "id", "scale": "stats_x", "interval": 0.5},
+                "y1": {"field": "rangeStart", "scale": "stats_y"},
+                "y2": {"field": "rangeEnd", "scale": "stats_y"},
+                "stroke": {"color": "black"},
+                "strokeWidth": {"value": 1}
+            }
+        }
+    }, {
+        "description": "Boxplot rectangle",
+        "type": "rectangle",
+        "source": {"data": "stats"},
+        "render": {
+            "init": {
+                "xCenter": {"field": "id", "scale": "stats_x", "interval": 0.5},
+                "width": {"value": 10},
+                "y1": {"field": "stats.q25", "scale": "stats_y"},
+                "y2": {"field": "stats.q75", "scale": "stats_y"},
+                "fill": {"color": "black"},
+                "opacity": {"value": 0.6}
+            }
+        }
+    }, {
+        "description": "Boxplot median",
+        "type": "rectangle",
+        "source": {"data": "stats"},
+        "render": {
+            "init": {
+                "xCenter": {"field": "id", "scale": "stats_x", "interval": 0.5},
+                "yCenter": {"field": "stats.q50", "scale": "stats_y"},
+                "width": {"value": 10},
+                "height": {"value": 1},
+                "fill": {"color": "white"}
+            }
+        }
+    }, {
+        "description": "Boxplot separations",
+        "type": "line",
+        "source": {"data": "stats"},
+        "render": {
+            "init": {
+                "x": {"field": "id", "scale": "stats_x", "interval": 1},
+                "y1": {"value": "stats", "scale": "layout", "interval": 0},
+                "y2": {"value": "stats", "scale": "layout", "interval": 1},
+                "stroke": {"color": "black"},
+                "strokeWidth": {"value": 1},
+                "strokeDash": {"value": 4},
+                "opacity": {"value": "0.3"}
+            }
+        }
+    }, {
+        "description": "Area for the difference plot",
+        "type": "rectangle",
+        "render": {
+            "init": {
+                "x1": {"value": 0},
+                "x2": {"draw": "width"},
+                "y1": {"scale": "diff_y", "value": 0.25},
+                "y2": {"scale": "diff_y", "value": -0.25},
+                "fill": {"color": "black"},
+                "opacity": {"value": "0.05"}
+            }
+        }
+    }, {
+        "description": "Line for the difference center",
+        "type": "line",
+        "render": {
+            "init": {
+                "x1": {"value": 0},
+                "x2": {"draw": "width"},
+                "y": {"scale": "diff_y", "value": 0},
+                "stroke": {"color": "black"},
+                "strokeWidth": {"value": "1px"},
+                "opacity": {"value": "0.2"}
+            }
+        }
+    }, {
+        "description": "Background areas",
+        "type": "group",
+        "source": {"data": "background"},
+        "geoms": [{
+            "description": "outerband background area",
+            "type": "area",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "germline_tumor_x"},
+                    "y1": {"field": "outerband.top", "scale": "germline_tumor_y"},
+                    "y2": {"field": "outerband.bottom", "scale": "germline_tumor_y"},
+                    "fill": {"color": "black"},
+                    "opacity": {"value": 0.1}
+                }
+            }
+        }, {
+            "description": "innerband background area",
+            "type": "area",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "germline_tumor_x"},
+                    "y1": {"field": "innerband.top", "scale": "germline_tumor_y"},
+                    "y2": {"field": "innerband.bottom", "scale": "germline_tumor_y"},
+                    "fill": {"color": "black"},
+                    "opacity": {"value": 0.1}
+                }
+            }
+        }, {
+            "description": "Mean background area",
+            "type": "area",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "germline_tumor_x"},
+                    "y1": {"field": "centerband.top", "scale": "germline_tumor_y"},
+                    "y2": {"field": "centerband.bottom", "scale": "germline_tumor_y"},
+                    "fill": {"color": "black"},
+                    "stroke": {"color": "black"},
+                    "strokeWidth": {"value": "1px"},
+                    "opacity": {"value": 0.3}
+                }
+            }
+        }]
+    }, {
+        "description": "Coverages lines",
+        "type": "group",
+        "source": {"data": "coverages"},
+        "geoms": [{
+            "type": "curve",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "germline_tumor_x"},
+                    "y": {"field": "coverage_germline", "scale": "germline_tumor_y"},
+                    "curve": {"value": "linear"},
+                    "stroke": {"color": "green"},
+                    "strokeWidth": {"value": "1px"}
+                }
+            }
+        }, {
+            "type": "curve",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "germline_tumor_x"},
+                    "y": {"field": "coverage_tumor", "scale": "germline_tumor_y"},
+                    "curve": {"value": "linear"},
+                    "stroke": {"color": "red"},
+                    "strokeWidth": {"value": "1px"}
+                }
+            }
+        }, {
+            "type": "curve",
+            "render": {
+                "init": {
+                    "x": {"field": "position", "scale": "diff_x"},
+                    "y": {"field": "coverage_diff", "scale": "diff_y"},
+                    "curve": {"value": "linear"},
+                    "stroke": {"color": "orange"},
+                    "strokeWidth": {"value": "1px"}
+                }
+            }
+        }]
+    }, {
+    "type": "line",
+    "source": {"data": "coverages_regions"},
+        "render": {
+            "init": {
+                "x": {"field": "end", "scale": "germline_tumor_x"},
+                "y1": {"value": "germline_tumor", "scale": "layout", "interval": 0},
+                "y2": {"value": "germline_tumor", "scale": "layout", "interval": 1},
+                "stroke": {"color": "black"},
+                "strokeWdith": {"value": 1},
+                "strokeDash": {"value": 4},
+                "opacity": {"value": "0.3"}
+            }
+        }
+    }, {
+        "type": "line",
+        "source": {"data": "coverages_regions"},
+        "render": {
+            "init": {
+                "x": {"field": "end", "scale": "diff_x"},
+                "y1": {"value": "diff", "scale": "layout", "interval": 0},
+                "y2": {"value": "diff", "scale": "layout", "interval": 1},
+                "stroke": {"color": "black"},
+                "strokeWdith": {"value": 1},
+                "strokeDash": {"value": 4},
+                "opacity": {"value": "0.3"}
+            }
+        }
+    }, {
+        "name": "maskStats",
+        "type": "rectangle",
+        "source": {"data": "stats"},
+        "render": {
+            "init": {
+                "x1": {"field": "id", "scale": "stats_x", "interval": 0},
+                "x2": {"field": "id", "scale": "stats_x", "interval": 1},
+                "y1": {"value": "stats", "scale": "layout", "interval": 0},
+                "y2": {"value": "stats", "scale": "layout", "interval": 1},
+                "opacity": {"value": "0.3"},
+                "fill": {"value": "transparent"}
+            }
+        }
+    }, {
+        "name": "maskCoverages",
+        "type": "rectangle",
+        "source": {"data": "coverages_regions"},
+        "render": {
+            "init": {
+                "x1": {"field": "start", "scale": "germline_tumor_x"},
+                "y1": {"value": "germline_tumor", "scale": "layout", "interval": 0},
+                "x2": {"field": "end", "scale": "germline_tumor_x"},
+                "y2": {"value": "diff", "scale": "layout", "interval": 1},
+                "opacity": {"value": "0.3"},
+                "fill": {"value": "transparent"}
+            }
+        }
+    }],
+    "events": [{
+        "on": "enter:geom@exons, enter:geom@maskStats, enter:geom@maskCoverages", 
+        "update": {"state": "region_hover", "value": "event.datum.id"}
+    }, {
+        "on": "leave:scene",
+        "update": {"state": "region_hover", "value": "null"}
+    }]
+}
+

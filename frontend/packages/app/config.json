@@ -1,0 +1,14 @@
+{
+    "title": "MGviz",
+    "subtitle": "Apps",
+    "navigationLinks": [],
+    "apps": {
+        "/apps/cnvreporter": {
+            "app": "cnvreporter",
+            "title": "CNVReporter",
+            "shortDescription": "An application for exploring and reporting Copy Number Variants (CNVs) interactively.",
+            "options": null,
+            "sampleData": ""
+        }
+    }
+}

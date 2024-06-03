@@ -1,0 +1,36 @@
+@use "siimple-lib" as siimple;
+
+//Notifications root style
+.root {
+    display: block;
+    position: relative;
+    margin-left: 10px;
+}
+.button {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: siimple.$border-radius;
+}
+.button:hover {
+    color: siimple.dark("1");
+    //background-color: siimple.light("1");
+}
+.buttonActive {
+    color: siimple.color("primary") !important;
+    //background-color: siimple.light("2") !important;
+}
+//Dropdown menu
+.dropdown {
+    display: block;
+    background-color: siimple.light("2");
+    border-radius: siimple.$border-radius;
+    padding: 16px;
+    margin-top: 8px;
+    position: absolute;
+    right: 0px;
+    top: 100%;
+    overflow: auto;
+    max-height: 200px;
+    min-width: 200px;
+}
+

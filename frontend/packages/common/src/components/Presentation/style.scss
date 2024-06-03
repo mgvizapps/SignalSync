@@ -1,0 +1,36 @@
+@use "siimple-lib" as siimple;
+
+//Presentation wrapper
+.banner {
+    //position: sticky;
+    //top: 0px;
+    padding: 40px; 
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    //justify-content: center;
+    background-color: siimple.color("primary");
+    color: siimple.color("white");
+    border-radius: 16px; //siimple.$border-radius;
+}
+.bannerContent {
+    position: sticky;
+    top: 0px;
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+.bannerButton {
+    display: block;
+    background-color: rgba(#ffffff, 0.1);
+    color: #ffffff;
+    cursor: pointer;
+    border-radius: siimple.$border-radius;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+.bannerButton:hover {
+    //font-weight: bold;
+    background-color: rgba(#ffffff, 0.4);
+    transition: all 0.3s;
+}
+

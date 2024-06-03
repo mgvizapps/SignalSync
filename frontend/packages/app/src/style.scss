@@ -1,0 +1,7 @@
+@use "siimple-lib" as siimple;
+
+//Root style
+html {
+    background-color: siimple.light("1") !important;
+}
+

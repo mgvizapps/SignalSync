@@ -1,0 +1,35 @@
+@use "siimple-lib" as siimple;
+
+//Common styles
+.amplification,
+.deletion {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    margin-bottom: 8px !important;
+}
+
+//Amplification range style
+.amplification {
+    background-color: siimple.color-lighter("success") !important;
+    border-top-left-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+}
+.amplification:-webkit-slider-thumb,
+.amplification:-moz-range-thumb,
+.amplification:-ms-thumb {
+    background-color: siimple.color("success") !important;
+}
+
+//Deletion range style
+.deletion {
+    //direction: rtl !important;
+    background-color: siimple.color-lighter("error") !important;
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+}
+.deletion:-webkit-slider-thumb,
+.deletion:-moz-range-thumb,
+.deletion:-ms-thumb {
+    background-color: siimple.color("error") !important;
+}
+
